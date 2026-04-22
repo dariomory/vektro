@@ -5,7 +5,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: huggingchat-backend
+    container_name: vektro-backend
     ports:
       - "8000:8000"
     environment:
@@ -25,7 +25,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: huggingchat-frontend
+    container_name: vektro-frontend
     ports:
       - "3000:3000"
     depends_on:
@@ -35,4 +35,4 @@ services:
 
 volumes:
   model-cache:
-    name: huggingchat-model-cache
+    name: vektro-model-cache

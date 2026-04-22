@@ -6,7 +6,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || (
 );
 
 export const api = {
-  async sendMessage(message, conversationId = 'default') {
+  async sendMessage(message, conversationId = 'default', model = null) {
     const response = await fetch(`${API_BASE_URL}/chat`, {
       method: 'POST',
       headers: {
@@ -15,12 +15,23 @@ export const api = {
       body: JSON.stringify({
         message,
         conversation_id: conversationId,
+        ...(model ? { model } : {}),
       }),
     });
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({ detail: 'Unknown error' }));
       throw new Error(error.detail || 'Failed to send message');
+    }
+
+    return response.json();
+  },
+
+  async getModels() {
+    const response = await fetch(`${API_BASE_URL}/models`);
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch models');
     }
 
     return response.json();

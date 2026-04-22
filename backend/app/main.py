@@ -7,6 +7,7 @@ import os
 
 from .model import ChatModel
 from .conversation import ConversationManager
+from .models_registry import MODELS, ModelInfo, get_model, DEFAULT_MODEL_ID
 from .schemas import (
     ChatRequest,
     ChatResponse,
@@ -35,7 +36,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="Huggingface Chat API",
+    title="Vektro API",
     description="A chat API powered by a small Huggingface model",
     version="1.0.0",
     lifespan=lifespan
@@ -61,12 +62,38 @@ async def health_check():
     )
 
 
+@app.get("/models", response_model=list[ModelInfo])
+async def list_models():
+    """List the chat models the API advertises, with metadata for the UI.
+
+    Only models flagged `implemented=True` are actually served by /chat
+    today — the rest are listed so the frontend can render the selector,
+    but requests for them currently fall back to the default model.
+    """
+    return MODELS
+
+
 @app.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
     """Send a message and get a response from the model."""
     if not chat_model.is_loaded():
         raise HTTPException(status_code=503, detail="Model not loaded yet")
-    
+
+    # Model routing is structural for now — the requested model is
+    # resolved against the registry and logged, but all inference still
+    # goes through the default model until multi-model loading lands.
+    selected = get_model(request.model)
+    if request.model and selected.id != request.model:
+        logger.warning(
+            "Unknown model id '%s', falling back to %s",
+            request.model, selected.id
+        )
+    elif not selected.implemented and request.model:
+        logger.info(
+            "Model '%s' is not implemented yet; serving with %s",
+            request.model, DEFAULT_MODEL_ID
+        )
+
     try:
         conversation_manager.add_message(
             request.conversation_id,

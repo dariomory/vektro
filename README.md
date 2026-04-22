@@ -1,10 +1,10 @@
-# HuggingChat - AI Chat Application
+# Vektro - AI Chat Application
 
 ![Preview](preview.png)
 
 A chat application powered by a light Hugging Face language model, featuring a FastAPI backend and a modern React frontend.
 
-![HuggingChat](https://img.shields.io/badge/AI-Chat-blue) ![Python](https://img.shields.io/badge/Python-3.11-green) ![React](https://img.shields.io/badge/React-18-blue) ![Docker](https://img.shields.io/badge/Docker-Compose-blue)
+![Vektro](https://img.shields.io/badge/AI-Chat-blue) ![Python](https://img.shields.io/badge/Python-3.11-green) ![React](https://img.shields.io/badge/React-18-blue) ![Docker](https://img.shields.io/badge/Docker-Compose-blue)
 
 ## Quick Start
 
