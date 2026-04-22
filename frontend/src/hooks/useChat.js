@@ -1,7 +1,8 @@
 import { useState, useCallback, useEffect } from 'react';
 import { api } from '../services/api';
 
-const STORAGE_KEY = 'huggingchat_conversations';
+const STORAGE_KEY = 'vektro_conversations';
+const MODEL_STORAGE_KEY = 'vektro_selected_model';
 
 export function useChat() {
   const [conversations, setConversations] = useState(() => {
@@ -14,9 +15,23 @@ export function useChat() {
     const ids = Object.keys(parsed);
     return ids.length > 0 ? ids[0] : generateId();
   });
+  const [selectedModelId, setSelectedModelId] = useState(() => {
+    return localStorage.getItem(MODEL_STORAGE_KEY) || null;
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
+
+  useEffect(() => {
+    if (selectedModelId) {
+      localStorage.setItem(MODEL_STORAGE_KEY, selectedModelId);
+    }
+  }, [selectedModelId]);
+
+  // Each conversation remembers the model it started with, so switching
+  // the global selector doesn't rewrite history for existing chats.
+  const conversationModelId =
+    conversations[currentConversationId]?.model || selectedModelId;
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations));
@@ -49,11 +64,14 @@ export function useChat() {
       timestamp: new Date().toISOString(),
     };
 
+    const modelForSend = conversationModelId || selectedModelId;
+
     setConversations(prev => ({
       ...prev,
       [currentConversationId]: {
         id: currentConversationId,
         title: prev[currentConversationId]?.title || content.slice(0, 30) + '...',
+        model: prev[currentConversationId]?.model || modelForSend,
         messages: [...(prev[currentConversationId]?.messages || []), userMessage],
         updatedAt: new Date().toISOString(),
       },
@@ -63,7 +81,7 @@ export function useChat() {
     setError(null);
 
     try {
-      const response = await api.sendMessage(content, currentConversationId);
+      const response = await api.sendMessage(content, currentConversationId, modelForSend);
       
       const assistantMessage = {
         id: generateId(),
@@ -92,7 +110,7 @@ export function useChat() {
     } finally {
       setIsLoading(false);
     }
-  }, [currentConversationId]);
+  }, [currentConversationId, conversationModelId, selectedModelId]);
 
   const regenerateLastResponse = useCallback(async () => {
     if (currentMessages.length < 2) return;
@@ -219,6 +237,9 @@ export function useChat() {
     isLoading,
     error,
     isConnected,
+    selectedModelId,
+    setSelectedModelId,
+    conversationModelId,
     sendMessage,
     regenerateLastResponse,
     createNewConversation,

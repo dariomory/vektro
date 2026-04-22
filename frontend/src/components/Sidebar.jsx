@@ -1,4 +1,5 @@
 import React from 'react';
+import { ModelSelector } from './ModelSelector';
 
 export function Sidebar({
   conversations,
@@ -11,6 +12,8 @@ export function Sidebar({
   isConnected,
   theme,
   onToggleTheme,
+  selectedModelId,
+  onSelectModel,
 }) {
   const conversationList = Object.values(conversations).sort(
     (a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0)
@@ -23,7 +26,7 @@ export function Sidebar({
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
           </svg>
-          HuggingChat
+          Vektro
         </h1>
         <div className={`connection-status ${isConnected ? 'connected' : 'disconnected'}`}>
           <span className="status-dot"></span>
@@ -38,6 +41,13 @@ export function Sidebar({
         </svg>
         New Chat
       </button>
+
+      <div className="sidebar-section">
+        <ModelSelector
+          selectedModelId={selectedModelId}
+          onSelect={onSelectModel}
+        />
+      </div>
 
       <div className="conversations-list">
         <h3>Conversations</h3>
