@@ -12,6 +12,7 @@ class Message(BaseModel):
 class ChatRequest(BaseModel):
     message: str
     conversation_id: Optional[str] = "default"
+    model: Optional[str] = None  # model id from /models; falls back to default if unknown
 
 
 class ChatResponse(BaseModel):

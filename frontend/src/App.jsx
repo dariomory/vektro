@@ -18,6 +18,9 @@ function App() {
     isLoading,
     error,
     isConnected,
+    selectedModelId,
+    setSelectedModelId,
+    conversationModelId,
     sendMessage,
     regenerateLastResponse,
     createNewConversation,
@@ -60,6 +63,8 @@ function App() {
         isConnected={isConnected}
         theme={theme}
         onToggleTheme={toggleTheme}
+        selectedModelId={conversationModelId || selectedModelId}
+        onSelectModel={setSelectedModelId}
       />
 
       <main className="main-content">
