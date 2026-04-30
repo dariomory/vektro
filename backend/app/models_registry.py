@@ -34,9 +34,10 @@ class ModelInfo(BaseModel):
 # we do the real multi-model implementation — inference benchmarks on
 # the target hardware will tell us the truth.
 #
-# Milestone 1 ships ACTIVE_MODELS in the switcher (SmolLM2 + Phi-3 Mini).
-# Milestone 2 will move the entries below from UPCOMING_MODELS into
-# ACTIVE_MODELS and wire their chat templates into the inference path.
+# All four roadmap models are exposed in the switcher. Only SmolLM2 is
+# backed by real inference today (implemented=True); the others render
+# with a Preview badge on the frontend and fall back to the default
+# model on the backend until loading and per-model chat templates land.
 
 ACTIVE_MODELS: List[ModelInfo] = [
     ModelInfo(
@@ -61,11 +62,6 @@ ACTIVE_MODELS: List[ModelInfo] = [
         description="Strong reasoning for its size. Good balance of speed and quality.",
         implemented=False,
     ),
-]
-
-# Planned for milestone 2 — not exposed via /models yet, kept here so
-# the registry stays the single source of truth for the whole roadmap.
-UPCOMING_MODELS: List[ModelInfo] = [
     ModelInfo(
         id="gemma-2b",
         display_name="Gemma 2B",
@@ -91,8 +87,11 @@ UPCOMING_MODELS: List[ModelInfo] = [
     ),
 ]
 
-# Public list used by the API. Keeping the name MODELS so existing
-# imports stay stable when upcoming models are promoted in milestone 2.
+# Reserved for future roadmap entries (e.g. larger/specialised models)
+# that aren't ready to appear in the switcher yet.
+UPCOMING_MODELS: List[ModelInfo] = []
+
+# Public list used by the API.
 MODELS: List[ModelInfo] = ACTIVE_MODELS
 
 MODELS_BY_ID = {m.id: m for m in MODELS}
